@@ -101,7 +101,6 @@ function orientation(n) {
   var posExpr = generateSum(pos)
   var negExpr = generateSum(neg)
   var code = ["function inSphere", n, "(m){"]
-
   for(var i=0; i<n; ++i) {
     code.push("var w",i,"=",makeSquare(i,n),";")
     for(var j=0; j<n; ++j) {
@@ -110,14 +109,12 @@ function orientation(n) {
       }
     }
   }
-
   code.push("var p=", posExpr, ",n=", negExpr, ";\
 for(var i=p.length-1,j=n.length-1;i>=0&&j>=0;--i,--j){\
 if(p[i]<n[j]){return -1}else if(p[i]>n[j]){return 1}}\
 if(i>=0){return p[i]>0?1:(p[i]<0?-1:0)}\
 if(j>=0){return n[j]<0?1:(n[j]>0?-1:0)}\
 return 0};return inSphere", n)
-
   var proc = new Function("sum", "diff", "prod", "scale", code.join(""))
   return proc(robustSum, robustDiff, twoProduct, robustScale)
 }
