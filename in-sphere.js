@@ -112,7 +112,6 @@ function orientation(n) {
     }
   }
   code.push("var p=", posExpr, ",n=", negExpr, ",d=sub(p,n);return d[d.length-1];}return ", funcName)
-  console.log(code.join(""))
   var proc = new Function("sum", "diff", "prod", "scale", "sub", code.join(""))
   return proc(robustSum, robustDiff, twoProduct, robustScale, robustSubtract)
 }
