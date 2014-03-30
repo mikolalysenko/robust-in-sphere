@@ -4,6 +4,7 @@ var twoProduct = require("two-product")
 var robustSum = require("robust-sum")
 var robustDiff = require("robust-subtract")
 var robustScale = require("robust-scale")
+var robustSubtract = require("robust-subtract")
 
 module.exports = getInSphere
 
@@ -100,7 +101,8 @@ function orientation(n) {
   }
   var posExpr = generateSum(pos)
   var negExpr = generateSum(neg)
-  var code = ["function inSphere", n, "(m){"]
+  var funcName = "exactInSphere" + n
+  var code = ["function ", funcName, "(m){"]
   for(var i=0; i<n; ++i) {
     code.push("var w",i,"=",makeSquare(i,n),";")
     for(var j=0; j<n; ++j) {
@@ -109,58 +111,69 @@ function orientation(n) {
       }
     }
   }
-  code.push("var p=", posExpr, ",n=", negExpr, ";\
-for(var i=p.length-1,j=n.length-1;i>=0&&j>=0;--i,--j){\
-if(p[i]<n[j]){return -1}else if(p[i]>n[j]){return 1}}\
-if(i>=0){return p[i]>0?1:(p[i]<0?-1:0)}\
-if(j>=0){return n[j]<0?1:(n[j]>0?-1:0)}\
-return 0};return inSphere", n)
-  var proc = new Function("sum", "diff", "prod", "scale", code.join(""))
-  return proc(robustSum, robustDiff, twoProduct, robustScale)
+  code.push("var p=", posExpr, ",n=", negExpr, ",d=sub(p,n);return d[d.length-1];}return ", funcName)
+  console.log(code.join(""))
+  var proc = new Function("sum", "diff", "prod", "scale", "sub", code.join(""))
+  return proc(robustSum, robustDiff, twoProduct, robustScale, robustSubtract)
+}
+
+
+function inSphere0() { return 0 }
+function inSphere1() { return 0 }
+function inSphere2() { return 0 }
+function inSphere3(a, b, c) { 
+  if(a < b) {
+    if(a < c) {
+      if(c < b) {
+        return -1
+      } else if(c > b) {
+        return 1
+      } else {
+        return 0
+      }
+    } else if(a === c) {
+      return 0
+    } else {
+      return 1
+    }
+  } else {
+    if(b < c) {
+      if(c < a) {
+        return 1
+      } else if(c > a) {
+        return -1
+      } else {
+        return 0
+      }
+    } else if(b === c) {
+      return 0
+    } else {
+      return -1
+    }
+  }
 }
 
 var CACHED = [
-  function inSphere0() { return 0 },
-  function inSphere1() { return 0 },
-  function inSphere2() { return 0 },
-  function inSphere3(m) { 
-    var a = m[0][0], b = m[1][0], c = m[2][0]
-    if(a < b) {
-      if(a < c) {
-        if(c < b) {
-          return -1
-        } else if(c > b) {
-          return 1
-        } else {
-          return 0
-        }
-      } else if(a === c) {
-        return 0
-      } else {
-        return 1
-      }
-    } else {
-      if(b < c) {
-        if(c < a) {
-          return 1
-        } else if(c > a) {
-          return -1
-        } else {
-          return 0
-        }
-      } else if(b === c) {
-        return 0
-      } else {
-        return -1
-      }
-    }
-  }
+  inSphere0,
+  inSphere1,
+  inSphere2,
+  inSphere3  
 ]
 
-function getInSphere(m) {
-  while(CACHED.length <= m.length) {
-    CACHED.push(orientation(CACHED.length))
+function getInSphere(a,b,c) {
+  var n = arguments.length
+  switch(n) {
+    case 0:
+    case 1:
+    case 2:
+      return 0
+    case 3:
+      return inSphere3(a,b,c)
+    default:
+      while(CACHED.length <= n) {
+        CACHED.push(orientation(CACHED.length))
+      }
+      var p = CACHED[n]
+      return p(arguments)
   }
-  var p = CACHED[m.length]
-  return p(m)
 }

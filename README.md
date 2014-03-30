@@ -2,30 +2,29 @@ robust-in-sphere
 ================
 Exact arithmetic test to check if (n+2) points are cospherical.
 
+(Very) loosely inspired by [Jonathan Shewchuk's work on robust predicates](http://www.cs.cmu.edu/~quake/robust.html).  Currently not as fast, but pull requests are welcome.
+
 ## Example
 
 ```javascript
 var inSphere = require("robust-in-sphere")
 
-var points = [
+console.log(inSphere(
   [0, 1],
   [1, 0],
   [-1, 0],
-  [0, -1]
-]
-
-console.log(inSphere(points))
+  [0, -1]))
 ```
 
-### `require("robust-in-sphere")(points)`
+### `require("robust-in-sphere")(a,b,c,...)`
 Tests if a collection of `n+2` points in `n`-dimensional space are cospherical or if the last point is contained in the sphere or not.
 
-* `points` is a list of points
+* `a,b,c,...` is a list of points
 
 **Returns** A signed integer that gives the orientation of the points
-* `+1` if the last point is contained in the oriented sphere defined by the previous two points
-* `-1` if the last point is outside the sphere
+* `>0` if the last point is contained in the oriented sphere defined by the previous two points
+* `<0` if the last point is outside the sphere
 * `0` is the points are cospherical
 
 ## Credits
-(c) 2013 Mikola Lysenko. MIT License
+(c) 2014 Mikola Lysenko. MIT License
