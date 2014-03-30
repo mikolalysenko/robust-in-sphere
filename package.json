@@ -1,16 +1,16 @@
 {
   "name": "robust-in-sphere",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Exact arithmetic test to check if point is contained in sphere",
   "main": "in-sphere.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "robust-scale": "~0.0.3",
-    "robust-sum": "~0.0.2",
-    "two-product": "~0.0.0",
-    "robust-subtract": "0.0.0"
+    "robust-scale": "^0.0.3",
+    "robust-sum": "^0.0.2",
+    "two-product": "^0.0.0",
+    "robust-subtract": "^0.0.0"
   },
   "devDependencies": {
     "tape": "~2.0.0",
