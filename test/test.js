@@ -40,6 +40,18 @@ require("tape")(function(t) {
         [-x,-x],
         [x,-x],
         [0,0])), 1, "sphere test:" + x)
+    t.equals(sgn(inSphere(
+        [0,x],
+        [-x,-x],
+        [x,-x],
+        [0,2*x])), -1, "sphere test:" + x)
+    
+    t.equals(sgn(inSphere(
+        [0,x],
+        [-x,-x],
+        [x,-x],
+        [0,x])), 0, "sphere test:" + x)
+    
     x *= 10
   }
 
