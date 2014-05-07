@@ -1,6 +1,6 @@
 {
   "name": "robust-in-sphere",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Exact arithmetic test to check if point is contained in sphere",
   "main": "in-sphere.js",
   "directories": {
