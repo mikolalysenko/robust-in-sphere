@@ -26,7 +26,7 @@ function matrix(n) {
   for(var i=0; i<n; ++i) {
     result[i] = new Array(n)
     for(var j=0; j<n; ++j) {
-      result[i][j] = ["m[", j, "][", (n-i-2), "]"].join("")
+      result[i][j] = ["m", j, "[", (n-i-2), "]"].join("")
     }
   }
   return result
@@ -46,8 +46,8 @@ function generateSum(expr) {
 function makeProduct(a, b) {
   if(a.charAt(0) === "m") {
     if(b.charAt(0) === "w") {
-      var toks = a.split("]")
-      return ["w", b.substr(1), "m", toks[0].substr(2)].join("")
+      var toks = a.split("[")
+      return ["w", b.substr(1), "m", toks[0].substr(1)].join("")
     } else {
       return ["prod(", a, ",", b, ")"].join("")
     }
@@ -78,7 +78,7 @@ function determinant(m) {
 function makeSquare(d, n) {
   var terms = []
   for(var i=0; i<n-2; ++i) {
-    terms.push(["prod(m[", d, "][", i, "],m[", d, "][", i, "])"].join(""))
+    terms.push(["prod(m", d, "[", i, "],m", d, "[", i, "])"].join(""))
   }
   return generateSum(terms)
 }
@@ -101,12 +101,16 @@ function orientation(n) {
   var posExpr = generateSum(pos)
   var negExpr = generateSum(neg)
   var funcName = "exactInSphere" + n
-  var code = ["function ", funcName, "(m){"]
+  var funcArgs = []
+  for(var i=0; i<n; ++i) {
+    funcArgs.push("m" + i)
+  }
+  var code = ["function ", funcName, "(", funcArgs.join(), "){"]
   for(var i=0; i<n; ++i) {
     code.push("var w",i,"=",makeSquare(i,n),";")
     for(var j=0; j<n; ++j) {
       if(j !== i) {
-        code.push("var w",i,"m",j,"=scale(w",i,",m[",j,"][0]);")
+        code.push("var w",i,"m",j,"=scale(w",i,",m",j,"[0]);")
       }
     }
   }
@@ -184,32 +188,15 @@ function generateInSphereTest() {
   for(var i=2; i<=NUM_EXPAND; ++i) {
     code.push("case ", i, ":return o", i, "(", args.slice(0, i).join(), ");")
   }
-  code.push("}var s=new Array(arguments.length);for(var i=0;i<arguments.length;++i){s[i]=arguments[i]};return slow(s);}return getOrientation")
+  code.push("}var s=new Array(arguments.length);for(var i=0;i<arguments.length;++i){s[i]=arguments[i]};return slow(s);}return testInSphere")
   procArgs.push(code.join(""))
 
 
   var proc = Function.apply(undefined, procArgs)
-  module.exports = proc.apply(undefined, [slowOrient].concat(CACHED))
+  module.exports = proc.apply(undefined, [slowInSphere].concat(CACHED))
   for(var i=0; i<=NUM_EXPAND; ++i) {
     module.exports[i] = CACHED[i]
   }
 }
 
-
-function getInSphere(a,b,c) {
-  var n = arguments.length
-  switch(n) {
-    case 0:
-    case 1:
-    case 2:
-      return 0
-    case 3:
-      return inSphere3(a,b,c)
-    default:
-      while(CACHED.length <= n) {
-        CACHED.push(orientation(CACHED.length))
-      }
-      var p = CACHED[n]
-      return p(arguments)
-  }
-}
+generateInSphereTest()
