@@ -4,9 +4,8 @@ var twoProduct = require("two-product")
 var robustSum = require("robust-sum")
 var robustDiff = require("robust-subtract")
 var robustScale = require("robust-scale")
-var robustSubtract = require("robust-subtract")
 
-module.exports = getInSphere
+var NUM_EXPAND = 6
 
 function cofactor(m, c) {
   var result = new Array(m.length-1)
@@ -116,6 +115,8 @@ function orientation(n) {
   return proc(robustSum, robustDiff, twoProduct, robustScale)
 }
 
+var exactInSphere4 = orientation(4)
+var exactInSphere5 = orientation(5)
 
 function inSphere0() { return 0 }
 function inSphere1() { return 0 }
@@ -156,8 +157,44 @@ var CACHED = [
   inSphere0,
   inSphere1,
   inSphere2,
-  inSphere3  
+  inSphere3
 ]
+
+function slowInSphere(args) {
+  var proc = CACHED[args.length]
+  if(!proc) {
+    proc = CACHED[args.length] = orientation(args.length)
+  }
+  return proc.apply(undefined, args)
+}
+
+function generateInSphereTest() {
+  while(CACHED.length < NUM_EXPAND) {
+    CACHED.push(orientation(CACHED.length))
+  }
+  var args = []
+  var procArgs = ["slow"]
+  for(var i=0; i<NUM_EXPAND; ++i) {
+    args.push("a" + i)
+    procArgs.push("o" + i)
+  }
+  var code = [
+    "function testInSphere(", args.join(), "){switch(arguments.length){case 0:case 1:return 0;"
+  ]
+  for(var i=2; i<=NUM_EXPAND; ++i) {
+    code.push("case ", i, ":return o", i, "(", args.slice(0, i).join(), ");")
+  }
+  code.push("}var s=new Array(arguments.length);for(var i=0;i<arguments.length;++i){s[i]=arguments[i]};return slow(s);}return getOrientation")
+  procArgs.push(code.join(""))
+
+
+  var proc = Function.apply(undefined, procArgs)
+  module.exports = proc.apply(undefined, [slowOrient].concat(CACHED))
+  for(var i=0; i<=NUM_EXPAND; ++i) {
+    module.exports[i] = CACHED[i]
+  }
+}
+
 
 function getInSphere(a,b,c) {
   var n = arguments.length
