@@ -158,7 +158,6 @@ function generateInSphereTest() {
 
   var proc = Function.apply(undefined, procArgs)
 
-  console.log(proc + "")
   module.exports = proc.apply(undefined, [slowInSphere].concat(CACHED))
   for(var i=0; i<=NUM_EXPAND; ++i) {
     module.exports[i] = CACHED[i]
