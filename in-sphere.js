@@ -119,49 +119,14 @@ function orientation(n) {
   return proc(robustSum, robustDiff, twoProduct, robustScale)
 }
 
-var exactInSphere4 = orientation(4)
-var exactInSphere5 = orientation(5)
-
 function inSphere0() { return 0 }
 function inSphere1() { return 0 }
 function inSphere2() { return 0 }
-function inSphere3(a, b, c) { 
-  if(a < b) {
-    if(a < c) {
-      if(c < b) {
-        return -1
-      } else if(c > b) {
-        return 1
-      } else {
-        return 0
-      }
-    } else if(a === c) {
-      return 0
-    } else {
-      return 1
-    }
-  } else {
-    if(b < c) {
-      if(c < a) {
-        return 1
-      } else if(c > a) {
-        return -1
-      } else {
-        return 0
-      }
-    } else if(b === c) {
-      return 0
-    } else {
-      return -1
-    }
-  }
-}
 
 var CACHED = [
   inSphere0,
   inSphere1,
-  inSphere2,
-  inSphere3
+  inSphere2
 ]
 
 function slowInSphere(args) {
@@ -173,12 +138,12 @@ function slowInSphere(args) {
 }
 
 function generateInSphereTest() {
-  while(CACHED.length < NUM_EXPAND) {
+  while(CACHED.length <= NUM_EXPAND) {
     CACHED.push(orientation(CACHED.length))
   }
   var args = []
   var procArgs = ["slow"]
-  for(var i=0; i<NUM_EXPAND; ++i) {
+  for(var i=0; i<=NUM_EXPAND; ++i) {
     args.push("a" + i)
     procArgs.push("o" + i)
   }
@@ -191,8 +156,9 @@ function generateInSphereTest() {
   code.push("}var s=new Array(arguments.length);for(var i=0;i<arguments.length;++i){s[i]=arguments[i]};return slow(s);}return testInSphere")
   procArgs.push(code.join(""))
 
-
   var proc = Function.apply(undefined, procArgs)
+
+  console.log(proc + "")
   module.exports = proc.apply(undefined, [slowInSphere].concat(CACHED))
   for(var i=0; i<=NUM_EXPAND; ++i) {
     module.exports[i] = CACHED[i]

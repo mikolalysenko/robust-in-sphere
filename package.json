@@ -1,6 +1,6 @@
 {
   "name": "robust-in-sphere",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Exact arithmetic test to check if point is contained in sphere",
   "main": "in-sphere.js",
   "directories": {
@@ -34,5 +34,21 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/mikolalysenko/robust-in-sphere/issues"
+  },
+  "testling": {
+    "files": "test/*.js",
+    "browsers": [
+      "ie/8..latest",
+      "firefox/17..latest",
+      "firefox/nightly",
+      "chrome/22..latest",
+      "chrome/canary",
+      "opera/12..latest",
+      "opera/next",
+      "safari/5.1..latest",
+      "ipad/6.0..latest",
+      "iphone/6.0..latest",
+      "android-browser/4.2..latest"
+    ]
   }
 }
