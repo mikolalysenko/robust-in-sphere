@@ -90,7 +90,7 @@ function orientation(n) {
   for(var i=0; i<n; ++i) {
     m[0][i] = "1"
     m[n-1][i] = "w"+i
-  } 
+  }
   for(var i=0; i<n; ++i) {
     if((i&1)===0) {
       pos.push.apply(pos,determinant(cofactor(m, i)))
@@ -137,26 +137,37 @@ function slowInSphere(args) {
   return proc.apply(undefined, args)
 }
 
+function proc(slow, o0, o1, o2, o3, o4, o5, o6) {
+  function testInSphere(a0, a1, a2, a3, a4, a5) {
+    switch (arguments.length) {
+      case 0:
+      case 1:
+        return 0;
+      case 2:
+        return o2(a0, a1)
+      case 3:
+        return o3(a0, a1, a2)
+      case 4:
+        return o4(a0, a1, a2, a3)
+      case 5:
+        return o5(a0, a1, a2, a3, a4)
+      case 6:
+        return o6(a0, a1, a2, a3, a4, a5)
+    }
+
+    var s = new Array(arguments.length)
+    for (var i = 0; i < arguments.length; ++i) {
+      s[i] = arguments[i]
+    }
+    return slow(s)
+  }
+  return testInSphere
+}
+
 function generateInSphereTest() {
   while(CACHED.length <= NUM_EXPAND) {
     CACHED.push(orientation(CACHED.length))
   }
-  var args = []
-  var procArgs = ["slow"]
-  for(var i=0; i<=NUM_EXPAND; ++i) {
-    args.push("a" + i)
-    procArgs.push("o" + i)
-  }
-  var code = [
-    "function testInSphere(", args.join(), "){switch(arguments.length){case 0:case 1:return 0;"
-  ]
-  for(var i=2; i<=NUM_EXPAND; ++i) {
-    code.push("case ", i, ":return o", i, "(", args.slice(0, i).join(), ");")
-  }
-  code.push("}var s=new Array(arguments.length);for(var i=0;i<arguments.length;++i){s[i]=arguments[i]};return slow(s);}return testInSphere")
-  procArgs.push(code.join(""))
-
-  var proc = Function.apply(undefined, procArgs)
 
   module.exports = proc.apply(undefined, [slowInSphere].concat(CACHED))
   for(var i=0; i<=NUM_EXPAND; ++i) {
